@@ -1,0 +1,74 @@
+version: '3'
+
+services:
+
+
+  backend_b:
+    container_name: backend_b
+    build: 
+      context: .
+      dockerfile: docker/backend_b/Dockerfile 
+    ports:
+      - "8001:8001" 
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+
+  backend_c:
+    container_name: backend_c
+    build: 
+      context: .
+      dockerfile: docker/backend_c/Dockerfile
+    ports:
+      - "8002:8002"
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+
+  db:
+    container_name: db
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: db
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  frontend:
+    container_name: frontend
+    build: 
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - node_modules:/frontend/node_modules
+    env_file:
+      - ./.env
+
+  nginx:
+    container_name: nginx
+    build: 
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    ports:
+      - "80:80"
+      - "81:80" 
+    volumes:
+      - static:/backend_b/static
+      - static:/backend_c/static
+    depends_on:
+      - frontend
+      - backend_b
+      - backend_c
+
+volumes:
+  db-data:
+    driver: local
+  node_modules:
+  static:

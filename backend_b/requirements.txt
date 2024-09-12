@@ -1,0 +1,12 @@
+asgiref
+Django
+gunicorn
+packaging
+psycopg2-binary
+python-decouple
+sqlparse
+typing_extensions
+whitenoise
+Django
+djangorestframework
+django-cors-headers
